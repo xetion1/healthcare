@@ -804,7 +804,7 @@ export const PatientFormValidation = z.object({
     .string()
     .min(5, "Address must be at least 5 characters")
     .max(500, "Address must be at most 500 characters"),
-  occupation: z
+  profession: z
     .string()
     .min(2, "Occupation must be at least 2 characters")
     .max(500, "Occupation must be at most 500 characters"),
