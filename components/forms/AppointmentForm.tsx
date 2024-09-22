@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
+import { AppointmentOptions } from "@/constants";
 import { SelectItem } from "@/components/ui/select";
 import { Doctors } from "@/constants";
 import {
@@ -15,7 +15,9 @@ import {
 } from "@/lib/actions/appointment.actions";
 import { getAppointmentSchema } from "@/lib/validation";
 import { Appointment } from "@/types/appwrite.types";
-
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { FormControl } from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import "react-datepicker/dist/react-datepicker.css";
 
 import CustomFormField, { FormFieldType } from "../CustomFormField";
@@ -146,8 +148,8 @@ export const AppointmentForm = ({
               fieldType={FormFieldType.SELECT}
               control={form.control}
               name="primaryPhysician"
-              label="Doctor"
-              placeholder="Select a doctor"
+              label="Stylist"
+              placeholder="Select a stylist"
             >
               {Doctors.map((doctor, i) => (
                 <SelectItem key={doctor.name + i} value={doctor.name}>
@@ -171,27 +173,35 @@ export const AppointmentForm = ({
               name="schedule"
               label="Expected appointment date"
               showTimeSelect
-              dateFormat="MM/dd/yyyy  -  h:mm aa"
+              dateFormat="MM/dd/yyyy h:mm aa"
             />
 
             <div
               className={`flex flex-col gap-6  ${type === "create" && "xl:flex-row"}`}
             >
               <CustomFormField
-                fieldType={FormFieldType.TEXTAREA}
+                fieldType={FormFieldType.SKELETON} // Use SKELETON to render custom content
                 control={form.control}
                 name="reason"
                 label="Appointment reason"
-                placeholder="Annual montly check-up"
-                disabled={type === "schedule"}
-              />
-
-              <CustomFormField
-                fieldType={FormFieldType.TEXTAREA}
-                control={form.control}
-                name="note"
-                label="Comments/notes"
-                placeholder="Prefer afternoon appointments, if possible"
+                renderSkeleton={(field) => (
+                  <FormControl>
+                    <RadioGroup
+                      className="flex h-11 gap-6 xl:justify-between"
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      {AppointmentOptions.map((option, i) => (
+                        <div key={option + i} className="radio-group">
+                          <RadioGroupItem value={option} id={option} />
+                          <Label htmlFor={option} className="cursor-pointer">
+                            {option}
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                )}
                 disabled={type === "schedule"}
               />
             </div>

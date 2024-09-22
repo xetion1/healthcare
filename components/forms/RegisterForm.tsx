@@ -11,11 +11,7 @@ import { Form, FormControl } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SelectItem } from "@/components/ui/select";
-import {
-  Doctors,
-  GenderOptions,
-  PatientFormDefaultValues,
-} from "@/constants";
+import { Doctors, GenderOptions, PatientFormDefaultValues } from "@/constants";
 import { registerPatient } from "@/lib/actions/patient.actions";
 import { PatientFormValidation } from "@/lib/validation";
 
@@ -114,8 +110,6 @@ const RegisterForm = ({ user }: { user: User }) => {
 
           {/* EMAIL & PHONE */}
           <div className="flex flex-col gap-6 xl:flex-row">
-
-
             <CustomFormField
               fieldType={FormFieldType.PHONE_INPUT}
               control={form.control}
@@ -159,28 +153,20 @@ const RegisterForm = ({ user }: { user: User }) => {
               )}
             />
           </div>
-
-
-          {/* Emergency Contact Name & Emergency Contact Number */}
-          <div className="flex flex-col gap-6 xl:flex-row">
-
-
-
-          </div>
         </section>
 
         <section className="space-y-6">
           <div className="mb-9 space-y-1">
-            <h2 className="sub-header">Medical Information</h2>
+            <h2 className="sub-header">Preferred Stylist</h2>
           </div>
 
-          {/* PRIMARY CARE PHYSICIAN */}
+          {/* PRIMARY stylist */}
           <CustomFormField
             fieldType={FormFieldType.SELECT}
             control={form.control}
             name="primaryPhysician"
-            label="Primary care physician"
-            placeholder="Select a physician"
+            label="Select a stylist"
+            placeholder="Select a stylist"
           >
             {Doctors.map((doctor, i) => (
               <SelectItem key={doctor.name + i} value={doctor.name}>
@@ -198,35 +184,26 @@ const RegisterForm = ({ user }: { user: User }) => {
             ))}
           </CustomFormField>
 
-          {/* INSURANCE & POLICY NUMBER */}
-          <div className="flex flex-col gap-6 xl:flex-row">
-
-
-
-          </div>
-
-          {/* ALLERGY & CURRENT MEDICATIONS */}
+          {/* Hair Information */}
+          <h2 className="sub-header">Hair & Health Information</h2>
           <div className="flex flex-col gap-6 xl:flex-row">
             <CustomFormField
               fieldType={FormFieldType.TEXTAREA}
               control={form.control}
               name="allergies"
-              label="Allergies (if any)"
-              placeholder="Peanuts, Penicillin, Pollen"
+              label="Any allergies to hair products or ingredients? (if yes, please list)"
+              placeholder="e.g., PPD, ammonia, fragrance"
             />
-
           </div>
 
           {/* FAMILY MEDICATION & PAST MEDICATIONS */}
           <div className="flex flex-col gap-6 xl:flex-row">
-
-
             <CustomFormField
               fieldType={FormFieldType.TEXTAREA}
               control={form.control}
-              name="pastMedicalHistory"
-              label="Past medical history"
-              placeholder="Appendectomy in 2015, Asthma diagnosis in childhood"
+              name="specificRequests" // New field, optional
+              label="Any specific concerns or requests for your hair? (optional)"
+              placeholder="e.g., looking for a low-maintenance style"
             />
           </div>
         </section>

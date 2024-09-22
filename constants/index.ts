@@ -1,4 +1,9 @@
 export const GenderOptions = ["Male", "Female", "Other"];
+export const AppointmentOptions = [
+  "Hair cutting",
+  "Hair coloring",
+  "Beard cutting",
+];
 
 export const PatientFormDefaultValues = {
   firstName: "",
@@ -16,43 +21,22 @@ export const PatientFormDefaultValues = {
   privacyConsent: false,
 };
 
-
 export const Doctors = [
   {
     image: "/assets/images/dr-green.png",
-    name: "John Green",
+    name: "Greta",
   },
   {
     image: "/assets/images/dr-cameron.png",
-    name: "Leila Cameron",
+    name: "Dovilė",
   },
   {
     image: "/assets/images/dr-livingston.png",
-    name: "David Livingston",
+    name: "Herkus",
   },
   {
     image: "/assets/images/dr-peter.png",
-    name: "Evan Peter",
-  },
-  {
-    image: "/assets/images/dr-powell.png",
-    name: "Jane Powell",
-  },
-  {
-    image: "/assets/images/dr-remirez.png",
-    name: "Alex Ramirez",
-  },
-  {
-    image: "/assets/images/dr-lee.png",
-    name: "Jasmine Lee",
-  },
-  {
-    image: "/assets/images/dr-cruz.png",
-    name: "Alyana Cruz",
-  },
-  {
-    image: "/assets/images/dr-sharma.png",
-    name: "Hardik Sharma",
+    name: "Mindaugas",
   },
 ];
 

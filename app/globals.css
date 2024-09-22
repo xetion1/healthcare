@@ -348,3 +348,10 @@
 .PhoneInputInput::placeholder {
   color: #1a1d21;
 }
+.react-datepicker__time-container
+  .react-datepicker__time
+  .react-datepicker__time-box
+  ul.react-datepicker__time-list
+  li.react-datepicker__time-list-item--disabled {
+  display: none;
+}

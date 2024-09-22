@@ -61,7 +61,7 @@ export const CreateAppointmentSchema = z.object({
 export const ScheduleAppointmentSchema = z.object({
   primaryPhysician: z.string().min(2, "Select at least one doctor"),
   schedule: z.coerce.date(),
-  reason: z.string().optional(),
+  reason: z.enum(["Hair cutting", "Hair coloring", "Beard cutting"]),
   note: z.string().optional(),
   cancellationReason: z.string().optional(),
 });

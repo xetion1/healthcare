@@ -1,14 +1,41 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-
 import { Doctors } from "@/constants";
 import { formatDateTime } from "@/lib/utils";
 import { Appointment } from "@/types/appwrite.types";
-
 import { AppointmentModal } from "../AppointmentModal";
 import { StatusBadge } from "../StatusBadge";
+import { getPatient } from "@/lib/actions/patient.actions";
+
+// Patient component to fetch and display patient name
+const PatientNameCell = ({ userId }: { userId: string }) => {
+  const [patientName, setPatientName] = useState<string>("Loading...");
+
+  useEffect(() => {
+    const fetchPatient = async () => {
+      try {
+        const patient = await getPatient(userId);
+
+        // If no patient is found, set the name to "Unknown"
+        if (!patient) {
+          setPatientName("Unknown");
+        } else {
+          setPatientName(patient.name || "N/A");
+        }
+      } catch (error) {
+        console.error("Error fetching patient details:", error);
+        setPatientName("N/A");
+      }
+    };
+
+    fetchPatient();
+  }, [userId]);
+
+  return <p className="text-14-medium">{patientName}</p>;
+};
 
 export const columns: ColumnDef<Appointment>[] = [
   {
@@ -22,7 +49,10 @@ export const columns: ColumnDef<Appointment>[] = [
     header: "Patient",
     cell: ({ row }) => {
       const appointment = row.original;
-      return <p className="text-14-medium ">{appointment.patient.name}</p>;
+      const patientId = appointment.patient?.userId || appointment.userId;
+
+      // Render PatientNameCell component and pass the patientId
+      return <PatientNameCell userId={patientId} />;
     },
   },
   {
