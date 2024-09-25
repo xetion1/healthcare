@@ -51,7 +51,7 @@ export const AppointmentForm = ({
     resolver: zodResolver(AppointmentFormValidation),
     defaultValues: {
       location: "",
-      barber: appointment ? appointment?.barber : "",
+      primaryPhysician: appointment ? appointment?.primaryPhysician : "",
       schedule: appointment
         ? new Date(appointment?.schedule!)
         : new Date(Date.now()),
@@ -64,9 +64,9 @@ export const AppointmentForm = ({
   // State for dynamic pricing
   const [price, setPrice] = useState<number | null>(null);
 
-  // Watch for changes in location, barber, and reason
+  // Watch for changes in location, stylist, and reason
   const selectedLocation = form.watch("location");
-  const selectedBarber = form.watch("barber");
+  const selectedStylist = form.watch("primaryPhysician");
   const selectedReason = form.watch("reason");
   const selectedDate: Date = form.watch("schedule");
 
@@ -77,18 +77,18 @@ export const AppointmentForm = ({
 
   // Filter available dates based on barber's schedule
   const isDateAvailable = (date: Date) => {
-    if (!selectedBarber || !selectedLocation) return false;
-    const barber = Barbers.find((b) => b.name === selectedBarber);
+    if (!selectedStylist || !selectedLocation) return false;
+    const barber = Barbers.find((b) => b.name === selectedStylist);
     if (!barber) return false;
 
-    const dayName = DaysOfWeek[date.getDay()];
+    const dayName = DaysOfWeek[date.getDay() - 1]; // getDay() returns 0-6 (Sunday-Saturday)
     const barberSchedule = barber.schedule[selectedLocation] || [];
     return barberSchedule.includes(dayName);
   };
 
   useEffect(() => {
-    if (selectedBarber && selectedReason) {
-      const barber = Barbers.find((b) => b.name === selectedBarber);
+    if (selectedStylist && selectedReason) {
+      const barber = Barbers.find((b) => b.name === selectedStylist);
       if (barber && barber.priceMap[selectedReason] !== undefined) {
         setPrice(barber.priceMap[selectedReason]);
       } else {
@@ -97,7 +97,7 @@ export const AppointmentForm = ({
     } else {
       setPrice(null);
     }
-  }, [selectedBarber, selectedReason]);
+  }, [selectedStylist, selectedReason]);
 
   const onSubmit = async (
     values: z.infer<typeof AppointmentFormValidation>
@@ -122,7 +122,7 @@ export const AppointmentForm = ({
           userId,
           patient: patientId,
           location: values.location,
-          barber: values.barber,
+          primaryPhysician: values.primaryPhysician,
           schedule: new Date(values.schedule),
           reason: values.reason!,
           status,
@@ -144,7 +144,7 @@ export const AppointmentForm = ({
           appointmentId: appointment.$id,
           appointment: {
             location: values.location,
-            barber: values.barber,
+            primaryPhysician: values.primaryPhysician,
             schedule: new Date(values.schedule),
             status,
             cancellationReason: values.cancellationReason,
@@ -181,14 +181,11 @@ export const AppointmentForm = ({
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex-1 space-y-6 p-4"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 space-y-6">
         {type === "create" && (
           <section className="mb-12 space-y-4">
-            <h1 className="text-2xl font-bold">New Appointment</h1>
-            <p className="text-gray-700">
+            <h1 className="header">New Appointment</h1>
+            <p className="text-dark-700">
               Book your appointment in just a few steps.
             </p>
           </section>
@@ -215,7 +212,7 @@ export const AppointmentForm = ({
             <CustomFormField
               fieldType={FormFieldType.SELECT}
               control={form.control}
-              name="barber"
+              name="primaryPhysician"
               label="Select a Barber"
               placeholder="Select a barber"
             >
@@ -227,7 +224,7 @@ export const AppointmentForm = ({
                       alt={barber.name}
                       width={32}
                       height={32}
-                      className="rounded-full border border-gray-500"
+                      className="rounded-full border border-dark-500"
                     />
                     <p>{barber.name}</p>
                   </div>
@@ -265,7 +262,7 @@ export const AppointmentForm = ({
             {price !== null && (
               <div className="animate-fadeIn mt-4 p-4 rounded border border-green-500 bg-green-100 text-green-700">
                 <h3 className="text-xl font-bold">
-                  Price for {selectedReason} with {selectedBarber}: €{price}
+                  Price for {selectedReason} with {selectedStylist}: €{price}
                 </h3>
               </div>
             )}
@@ -297,10 +294,8 @@ export const AppointmentForm = ({
         <SubmitButton
           isLoading={isLoading}
           className={`${
-            type === "cancel"
-              ? "bg-red-600 hover:bg-red-700"
-              : "bg-blue-600 hover:bg-blue-700"
-          } w-full text-white py-2 rounded transition duration-150`}
+            type === "cancel" ? "shad-danger-btn" : "shad-primary-btn"
+          } w-full`}
         >
           {buttonLabel}
         </SubmitButton>

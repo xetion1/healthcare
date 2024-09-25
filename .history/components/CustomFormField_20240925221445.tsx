@@ -1,12 +1,8 @@
-// components/CustomFormField.tsx
-
 /* eslint-disable no-unused-vars */
 import Image from "next/image";
 import ReactDatePicker from "react-datepicker";
 import { Control, Controller } from "react-hook-form";
 import PhoneInput from "react-phone-number-input";
-import { registerLocale } from "react-datepicker";
-import lt from "date-fns/locale/lt"; // Lithuanian locale
 
 import { Checkbox } from "./ui/checkbox";
 import {
@@ -19,7 +15,8 @@ import {
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
-
+import { registerLocale } from "react-datepicker";
+import lt from "date-fns/locale/lt"; // Lithuanian locale
 registerLocale("lt", lt);
 
 export enum FormFieldType {
@@ -44,7 +41,6 @@ interface CustomProps {
   showTimeSelect?: boolean;
   children?: React.ReactNode;
   renderSkeleton?: (field: any) => React.ReactNode;
-  filterDate?: (date: Date) => boolean;
   fieldType: FormFieldType;
 }
 
@@ -52,7 +48,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
   switch (props.fieldType) {
     case FormFieldType.INPUT:
       return (
-        <div className="flex items-center rounded-md border border-gray-500 bg-white">
+        <div className="flex rounded-md border border-dark-500 bg-dark-400">
           {props.iconSrc && (
             <Image
               src={props.iconSrc}
@@ -66,7 +62,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
             <Input
               placeholder={props.placeholder}
               {...field}
-              className="border-0 flex-1"
+              className="shad-input border-0"
             />
           </FormControl>
         </div>
@@ -77,7 +73,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
           <Textarea
             placeholder={props.placeholder}
             {...field}
-            className="border border-gray-300"
+            className="shad-textArea"
             disabled={props.disabled}
           />
         </FormControl>
@@ -86,7 +82,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
       return (
         <FormControl>
           <PhoneInput
-            defaultCountry="LT"
+            defaultCountry="US"
             placeholder={props.placeholder}
             international
             withCountryCallingCode
@@ -105,7 +101,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
               checked={field.value}
               onCheckedChange={field.onChange}
             />
-            <label htmlFor={props.name} className="text-gray-700">
+            <label htmlFor={props.name} className="checkbox-label">
               {props.label}
             </label>
           </div>
@@ -121,7 +117,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
             timeIntervals={30}
             dateFormat={props.dateFormat || "MM/dd/yyyy"}
             placeholderText={props.placeholder}
-            className="w-full border border-gray-300 p-2 rounded"
+            className="date-picker-input"
             filterDate={props.filterDate}
             minDate={new Date()}
             locale="lt"
@@ -132,10 +128,12 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
       return (
         <FormControl>
           <Select value={field.value} onValueChange={field.onChange}>
-            <SelectTrigger className="w-full border border-gray-300">
+            <SelectTrigger className="shad-select-trigger">
               <SelectValue placeholder={props.placeholder} />
             </SelectTrigger>
-            <SelectContent>{props.children}</SelectContent>
+            <SelectContent className="shad-select-content">
+              {props.children}
+            </SelectContent>
           </Select>
         </FormControl>
       );
@@ -148,6 +146,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
 
 const CustomFormField = (props: CustomProps) => {
   const { control, name, label } = props;
+
   return (
     <FormField
       control={control}
@@ -155,11 +154,11 @@ const CustomFormField = (props: CustomProps) => {
       render={({ field }) => (
         <FormItem className="flex-1">
           {props.fieldType !== FormFieldType.CHECKBOX && label && (
-            <FormLabel className="text-gray-700">{label}</FormLabel>
+            <FormLabel className="shad-input-label">{label}</FormLabel>
           )}
           <RenderInput field={field} props={props} />
 
-          <FormMessage className="text-red-500" />
+          <FormMessage className="shad-error" />
         </FormItem>
       )}
     />

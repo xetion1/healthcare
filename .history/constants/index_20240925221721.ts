@@ -3,16 +3,18 @@
 export const GenderOptions = ["Male", "Female", "Other"];
 
 export const PatientFormDefaultValues = {
-  name: "",
+  firstName: "",
+  lastName: "",
   email: "",
   phone: "",
   birthDate: new Date(Date.now()),
   gender: "Male" as Gender,
-  barber: "",
+  primaryPhysician: "",
   allergies: "",
-  specificRequests: "",
+  pastMedicalHistory: "",
   identificationDocument: [],
-  serviceConsent: false,
+  treatmentConsent: false,
+  disclosureConsent: false,
   privacyConsent: false,
 };
 
@@ -70,13 +72,13 @@ export const Barbers = [
 export const AppointmentOptions = ["Hair Cutting", "Hair Coloring"];
 
 export const DaysOfWeek = [
-  "Sunday",
   "Monday",
   "Tuesday",
   "Wednesday",
   "Thursday",
   "Friday",
   "Saturday",
+  "Sunday",
 ];
 
 export const StatusIcon = {
@@ -84,3 +86,6 @@ export const StatusIcon = {
   pending: "/assets/icons/pending.svg",
   cancelled: "/assets/icons/cancelled.svg",
 };
+/Users/aadnostux / Desktop / autos -
+  template -
+  main / healthcare / constants / index.ts;
