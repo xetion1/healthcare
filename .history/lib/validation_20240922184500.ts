@@ -77,20 +77,13 @@ export const CancelAppointmentSchema = z.object({
     .max(500, "Reason must be at most 500 characters"),
 });
 
-export const getAppointmentSchema = (type: string) => {
-  if (type === "cancel") {
-    return z.object({
-      cancellationReason: z.string().nonempty("Please provide a reason"),
-    });
-  } else {
-    return z.object({
-      primaryPhysician: z.string().nonempty("Please select a stylist"),
-      schedule: z.date({
-        required_error: "Please select a date",
-        invalid_type_error: "Invalid date format",
-      }),
-      reason: z.string().nonempty("Please select a reason"),
-      note: z.string().optional(),
-    });
+export function getAppointmentSchema(type: string) {
+  switch (type) {
+    case "create":
+      return CreateAppointmentSchema;
+    case "cancel":
+      return CancelAppointmentSchema;
+    default:
+      return ScheduleAppointmentSchema;
   }
-};
+}

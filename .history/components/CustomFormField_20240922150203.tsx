@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
+import { E164Number } from "libphonenumber-js/core";
 import Image from "next/image";
-import ReactDatePicker from "react-datepicker";
+import ReactDatePicker, { ReactDatePickerProps } from "react-datepicker";
 import { Control, Controller } from "react-hook-form";
 import PhoneInput from "react-phone-number-input";
 
@@ -15,6 +16,7 @@ import {
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
+import { setHours, setMinutes } from "date-fns";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -83,7 +85,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
             placeholder={props.placeholder}
             international
             withCountryCallingCode
-            value={field.value}
+            value={field.value as E164Number | undefined}
             onChange={field.onChange}
             className="input-phone"
           />
@@ -105,26 +107,56 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
         </FormControl>
       );
     case FormFieldType.DATE_PICKER:
+      // Function to generate excluded times
+      const getExcludedTimes = () => {
+        let excludedTimes = [];
+        for (let hour = 0; hour < 24; hour++) {
+          // Exclude hours from 18:00 (6 PM) to 07:59 (7:59 AM)
+          if (hour >= 18 || hour < 8) {
+            for (let minute = 0; minute < 60; minute += 30) {
+              // Assuming 30-minute intervals
+              excludedTimes.push(
+                setHours(setMinutes(new Date(), minute), hour)
+              );
+            }
+          }
+        }
+        return excludedTimes;
+      };
+
       return (
-        <FormControl>
-          <ReactDatePicker
-            selected={field.value}
-            onChange={(date: Date | null) => field.onChange(date)}
-            showTimeSelect={props.showTimeSelect}
-            timeIntervals={30}
-            dateFormat={props.dateFormat || "MM/dd/yyyy"}
-            placeholderText={props.placeholder}
-            className="date-picker-input"
+        <div className="flex rounded-md border border-dark-500 bg-dark-400">
+          <Image
+          // ...
           />
-        </FormControl>
+          <FormControl>
+            <ReactDatePicker
+              selected={field.value as Date | null}
+              onChange={(date: Date | null) => field.onChange(date)}
+              showTimeSelect={!!field.value}
+              timeIntervals={30}
+              timeCaption="Time"
+              dateFormat="MMMM d, yyyy h:mm aa"
+              timeFormat="h:mm aa"
+              excludeTimes={getExcludedTimes()}
+              minTime={setHours(setMinutes(new Date(), 0), 8)}
+              maxTime={setHours(setMinutes(new Date(), 0), 17)}
+              wrapperClassName="date-picker"
+              {...field}
+            />
+          </FormControl>
+        </div>
       );
+
     case FormFieldType.SELECT:
       return (
         <FormControl>
-          <Select value={field.value} onValueChange={field.onChange}>
-            <SelectTrigger className="shad-select-trigger">
-              <SelectValue placeholder={props.placeholder} />
-            </SelectTrigger>
+          <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <FormControl>
+              <SelectTrigger className="shad-select-trigger">
+                <SelectValue placeholder={props.placeholder} />
+              </SelectTrigger>
+            </FormControl>
             <SelectContent className="shad-select-content">
               {props.children}
             </SelectContent>

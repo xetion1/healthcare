@@ -8,20 +8,19 @@ export interface Patient extends Models.Document {
   birthDate: Date;
   gender: Gender;
   primaryPhysician: string;
-  allergies?: string;
-  pastMedicalHistory?: string;
-  identificationDocument?: FormData;
+  allergies: string | undefined;
+  pastMedicalHistory: string | undefined;
+  identificationDocument: FormData | undefined;
   privacyConsent: boolean;
 }
 
 export interface Appointment extends Models.Document {
-  patient: string; // Patient ID
+  patient: string; // This is the patient ID, not the full Patient object
   schedule: Date;
   status: Status;
   primaryPhysician: string;
   reason: string;
-  note?: string;
+  note: string;
   userId: string;
-  cancellationReason?: string | null;
-  price?: number; // Added price field
+  cancellationReason: string | null;
 }

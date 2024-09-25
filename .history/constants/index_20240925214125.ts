@@ -1,4 +1,9 @@
 export const GenderOptions = ["Male", "Female", "Other"];
+export const AppointmentOptions = [
+  "Hair cutting",
+  "Hair coloring",
+  "Beard cutting",
+];
 
 export const PatientFormDefaultValues = {
   firstName: "",

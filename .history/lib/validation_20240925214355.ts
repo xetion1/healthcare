@@ -85,10 +85,7 @@ export const getAppointmentSchema = (type: string) => {
   } else {
     return z.object({
       primaryPhysician: z.string().nonempty("Please select a stylist"),
-      schedule: z.date({
-        required_error: "Please select a date",
-        invalid_type_error: "Invalid date format",
-      }),
+      schedule: z.date().nonempty("Please select a date"),
       reason: z.string().nonempty("Please select a reason"),
       note: z.string().optional(),
     });

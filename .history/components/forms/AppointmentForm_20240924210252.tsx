@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { AppointmentOptions, Doctors } from "@/constants";
@@ -17,6 +17,7 @@ import { Appointment } from "@/types/appwrite.types";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { FormControl } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
+import "react-datepicker/dist/react-datepicker.css";
 
 import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
@@ -37,6 +38,11 @@ export const AppointmentForm = ({
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedAppointmentReason, setSelectedAppointmentReason] = useState<
+    string | null
+  >(null);
+  const [selectedStylist, setSelectedStylist] = useState<string | null>(null);
+  const [appointmentPrice, setAppointmentPrice] = useState<number | null>(null);
 
   const AppointmentFormValidation = getAppointmentSchema(type);
 
@@ -53,32 +59,12 @@ export const AppointmentForm = ({
     },
   });
 
-  // State for dynamic pricing
-  const [price, setPrice] = useState<number | null>(null);
-
-  // Watch for changes in stylist and reason
-  const selectedStylist = form.watch("primaryPhysician");
-  const selectedReason = form.watch("reason");
-
-  useEffect(() => {
-    if (selectedStylist && selectedReason) {
-      const stylist = Doctors.find((doc) => doc.name === selectedStylist);
-      if (stylist && stylist.priceMap[selectedReason] !== undefined) {
-        setPrice(stylist.priceMap[selectedReason]);
-      } else {
-        setPrice(null);
-      }
-    } else {
-      setPrice(null);
-    }
-  }, [selectedStylist, selectedReason]);
-
   const onSubmit = async (
     values: z.infer<typeof AppointmentFormValidation>
   ) => {
     setIsLoading(true);
 
-    let status: Status;
+    let status;
     switch (type) {
       case "schedule":
         status = "scheduled";
@@ -92,18 +78,17 @@ export const AppointmentForm = ({
 
     try {
       if (type === "create" && patientId) {
-        const appointmentData = {
+        const appointment = {
           userId,
           patient: patientId,
           primaryPhysician: values.primaryPhysician,
           schedule: new Date(values.schedule),
           reason: values.reason!,
-          status,
+          status: status as Status,
           note: values.note,
-          price,
         };
 
-        const newAppointment = await createAppointment(appointmentData);
+        const newAppointment = await createAppointment(appointment);
 
         if (newAppointment) {
           form.reset();
@@ -111,16 +96,15 @@ export const AppointmentForm = ({
             `/patients/${userId}/new-appointment/success?appointmentId=${newAppointment.$id}`
           );
         }
-      } else if (appointment) {
+      } else {
         const appointmentToUpdate = {
           userId,
-          appointmentId: appointment.$id,
+          appointmentId: appointment?.$id!,
           appointment: {
             primaryPhysician: values.primaryPhysician,
             schedule: new Date(values.schedule),
-            status,
+            status: status as Status,
             cancellationReason: values.cancellationReason,
-            price,
           },
           type,
         };
@@ -130,7 +114,6 @@ export const AppointmentForm = ({
         if (updatedAppointment) {
           setOpen && setOpen(false);
           form.reset();
-          router.refresh();
         }
       }
     } catch (error) {
@@ -151,6 +134,31 @@ export const AppointmentForm = ({
       buttonLabel = "Submit Appointment";
   }
 
+  const handleReasonChange = (value: string) => {
+    console.log("Reason Selected:", value);
+    form.setValue("reason", value);
+    setSelectedAppointmentReason(value);
+
+    const selectedDoctor = Doctors.find(
+      (doctor) => doctor.name === form.getValues("primaryPhysician")
+    );
+    console.log("Selected Doctor:", selectedDoctor);
+    setAppointmentPrice(selectedDoctor ? selectedDoctor.priceMap[value] : null);
+  };
+
+  const handleReasonChange = (value: string) => {
+    form.setValue("reason", value);
+    setSelectedAppointmentReason(value);
+
+    // Find the currently selected stylist
+    const selectedDoctor = Doctors.find(
+      (doctor) => doctor.name === form.getValues("primaryPhysician")
+    );
+
+    // Calculate price based on both stylist and reason
+    setAppointmentPrice(selectedDoctor ? selectedDoctor.priceMap[value] : null);
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 space-y-6">
@@ -165,22 +173,22 @@ export const AppointmentForm = ({
 
         {type !== "cancel" && (
           <>
-            {/* Stylist Selection */}
             <CustomFormField
               fieldType={FormFieldType.SELECT}
               control={form.control}
               name="primaryPhysician"
-              label="Select a Stylist"
+              label="Stylist"
               placeholder="Select a stylist"
+              onValueChange={handleStylistChange}
             >
-              {Doctors.map((doctor) => (
-                <SelectItem key={doctor.name} value={doctor.name}>
-                  <div className="flex items-center gap-2">
+              {Doctors.map((doctor, i) => (
+                <SelectItem key={doctor.name + i} value={doctor.name}>
+                  <div className="flex cursor-pointer items-center gap-2">
                     <Image
                       src={doctor.image}
-                      alt={doctor.name}
                       width={32}
                       height={32}
+                      alt="doctor"
                       className="rounded-full border border-dark-500"
                     />
                     <p>{doctor.name}</p>
@@ -189,50 +197,46 @@ export const AppointmentForm = ({
               ))}
             </CustomFormField>
 
-            {/* Reason for Appointment */}
-            <CustomFormField
-              fieldType={FormFieldType.SKELETON}
-              control={form.control}
-              name="reason"
-              label="Appointment Reason"
-              renderSkeleton={(field) => (
-                <FormControl>
-                  <RadioGroup
-                    className="flex flex-wrap gap-4"
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    {AppointmentOptions.map((option) => (
-                      <div key={option} className="flex items-center">
-                        <RadioGroupItem value={option} id={option} />
-                        <Label htmlFor={option} className="ml-2 cursor-pointer">
-                          {option}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                </FormControl>
-              )}
-            />
-
-            {/* Display Price */}
-            {price !== null && (
-              <div className="animate-fadeIn mt-4 p-4 rounded bg-green-100 text-green-700">
-                <h3 className="text-xl font-bold">
-                  Price for {selectedReason} with {selectedStylist}: ${price}
-                </h3>
-              </div>
-            )}
-
-            {/* Schedule Picker */}
             <CustomFormField
               fieldType={FormFieldType.DATE_PICKER}
               control={form.control}
               name="schedule"
-              label="Expected Appointment Date"
+              label="Expected appointment date"
               showTimeSelect
               dateFormat="MM/dd/yyyy h:mm aa"
             />
+
+            <div
+              className={`flex flex-col gap-6  ${type === "create" && "xl:flex-row"}`}
+            >
+              <CustomFormField
+                fieldType={FormFieldType.SKELETON}
+                control={form.control}
+                name="reason"
+                label="Appointment reason"
+                renderSkeleton={(field) => (
+                  <FormControl>
+                    <RadioGroup
+                      className="flex h-11 gap-6 xl:justify-between"
+                      onValueChange={(value) => {
+                        handleReasonChange(value);
+                      }}
+                      defaultValue={field.value}
+                    >
+                      {AppointmentOptions.map((option, i) => (
+                        <div key={option + i} className="radio-group">
+                          <RadioGroupItem value={option} id={option} />
+                          <Label htmlFor={option} className="cursor-pointer">
+                            {option}
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                )}
+                disabled={type === "schedule"}
+              />
+            </div>
           </>
         )}
 
@@ -241,16 +245,24 @@ export const AppointmentForm = ({
             fieldType={FormFieldType.TEXTAREA}
             control={form.control}
             name="cancellationReason"
-            label="Reason for Cancellation"
-            placeholder="Provide a reason for cancellation"
+            label="Reason for cancellation"
+            placeholder="Urgent meeting came up"
           />
         )}
 
+        <div className="flex justify-between">
+          <p>
+            Appointment reason: {selectedAppointmentReason || "Not selected"}
+          </p>
+          <p>Stylist: {selectedStylist || "Not selected"}</p>
+          <p>
+            Price: {appointmentPrice !== null ? `$${appointmentPrice}` : "N/A"}
+          </p>
+        </div>
+
         <SubmitButton
           isLoading={isLoading}
-          className={`${
-            type === "cancel" ? "shad-danger-btn" : "shad-primary-btn"
-          } w-full`}
+          className={`${type === "cancel" ? "shad-danger-btn" : "shad-primary-btn"} w-full`}
         >
           {buttonLabel}
         </SubmitButton>
@@ -258,5 +270,3 @@ export const AppointmentForm = ({
     </Form>
   );
 };
-
-export default AppointmentForm;

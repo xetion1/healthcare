@@ -1,4 +1,9 @@
 export const GenderOptions = ["Male", "Female", "Other"];
+export const AppointmentOptions = [
+  "Hair cutting",
+  "Hair coloring",
+  "Beard cutting",
+];
 
 export const PatientFormDefaultValues = {
   firstName: "",
@@ -15,7 +20,6 @@ export const PatientFormDefaultValues = {
   disclosureConsent: false,
   privacyConsent: false,
 };
-
 export const Doctors = [
   {
     name: "Stylist 1",
@@ -43,6 +47,7 @@ export const AppointmentOptions = [
   "Hair Coloring",
   // Add more appointment reasons as needed
 ];
+
 export const StatusIcon = {
   scheduled: "/assets/icons/check.svg",
   pending: "/assets/icons/pending.svg",

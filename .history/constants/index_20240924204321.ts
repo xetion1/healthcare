@@ -1,4 +1,9 @@
 export const GenderOptions = ["Male", "Female", "Other"];
+export const AppointmentOptions = [
+  "Hair cutting",
+  "Hair coloring",
+  "Beard cutting",
+];
 
 export const PatientFormDefaultValues = {
   firstName: "",
@@ -18,30 +23,25 @@ export const PatientFormDefaultValues = {
 
 export const Doctors = [
   {
-    name: "Stylist 1",
-    image: "/path/to/image1.jpg",
-    priceMap: {
-      "Hair Cutting": 50,
-      "Hair Coloring": 100,
-      // Add other services and their prices
-    },
+    image: "/assets/images/dr-green.png",
+    name: "Greta",
+    price: 20, // Price for Greta's services
   },
   {
-    name: "Stylist 2",
-    image: "/path/to/image2.jpg",
-    priceMap: {
-      "Hair Cutting": 60,
-      "Hair Coloring": 110,
-      // Add other services and their prices
-    },
+    image: "/assets/images/dr-cameron.png",
+    name: "Dovilė",
+    price: 25, // Price for Dovilė's services
   },
-  // Add more stylists as needed
-];
-
-export const AppointmentOptions = [
-  "Hair Cutting",
-  "Hair Coloring",
-  // Add more appointment reasons as needed
+  {
+    image: "/assets/images/dr-livingston.png",
+    name: "Herkus",
+    price: 22, // Price for Herkus' services
+  },
+  {
+    image: "/assets/images/dr-peter.png",
+    name: "Mindaugas",
+    price: 18, // Price for Mindaugas' services
+  },
 ];
 export const StatusIcon = {
   scheduled: "/assets/icons/check.svg",
