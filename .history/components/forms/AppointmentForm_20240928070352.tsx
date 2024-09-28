@@ -45,7 +45,7 @@ export const AppointmentForm = ({
     defaultValues: {
       stylist: appointment ? appointment.stylist : "",
       schedule: appointment
-        ? new Date(appointment.schedule!)
+        ? new Date(appointment?.schedule!)
         : new Date(Date.now()),
       reason: appointment ? appointment.reason : "",
       note: appointment?.note || "",
@@ -95,12 +95,12 @@ export const AppointmentForm = ({
         const appointmentData = {
           userId,
           patient: patientId,
-          stylist: values.stylist,
+          stylist: values.stylist, // Correctly using 'stylist'
           schedule: new Date(values.schedule),
           reason: values.reason!,
           status,
           note: values.note,
-          price, // Ensure 'price' is included
+          price,
         };
 
         const newAppointment = await createAppointment(appointmentData);
@@ -120,7 +120,7 @@ export const AppointmentForm = ({
             schedule: new Date(values.schedule),
             status,
             cancellationReason: values.cancellationReason,
-            price, // Ensure 'price' is included
+            price,
           },
           type,
         };

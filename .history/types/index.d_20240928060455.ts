@@ -36,14 +36,13 @@ declare type CreateAppointmentParams = {
   reason: string;
   schedule: Date;
   status: Status;
-  note?: string;
-  price?: number;
+  note: string | undefined;
 };
 
 declare type UpdateAppointmentParams = {
   appointmentId: string;
   userId: string;
   timeZone: string;
-  appointment: Partial<Appointment>;
-  type: "schedule" | "cancel";
+  appointment: Appointment;
+  type: string;
 };

@@ -94,7 +94,7 @@ export const sendSMSNotification = async (userId: string, content: string) => {
     );
     return parseStringify(message);
   } catch (error) {
-    console.error("An error occurred while sending SMS:", error);
+    console.error("An error occurred while sending sms:", error);
     throw error; // Ensure the error is propagated
   }
 };
@@ -108,7 +108,7 @@ export const updateAppointment = async ({
   type,
 }: UpdateAppointmentParams) => {
   try {
-    // Update appointment -> https://appwrite.io/docs/references/cloud/server-nodejs/databases#updateDocument
+    // Update appointment to scheduled -> https://appwrite.io/docs/references/cloud/server-nodejs/databases#updateDocument
     const updatedAppointment = await databases.updateDocument(
       DATABASE_ID!,
       APPOINTMENT_COLLECTION_ID!,

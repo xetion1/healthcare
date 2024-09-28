@@ -56,7 +56,6 @@ export const CreateAppointmentSchema = z.object({
     .max(500, "Reason must be at most 500 characters"),
   note: z.string().optional(),
   cancellationReason: z.string().optional(),
-  // price: z.number().optional(), // Uncomment if you want to validate 'price'
 });
 
 export const ScheduleAppointmentSchema = z.object({

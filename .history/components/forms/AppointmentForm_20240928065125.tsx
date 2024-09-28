@@ -45,7 +45,7 @@ export const AppointmentForm = ({
     defaultValues: {
       stylist: appointment ? appointment.stylist : "",
       schedule: appointment
-        ? new Date(appointment.schedule!)
+        ? new Date(appointment?.schedule!)
         : new Date(Date.now()),
       reason: appointment ? appointment.reason : "",
       note: appointment?.note || "",
@@ -100,7 +100,7 @@ export const AppointmentForm = ({
           reason: values.reason!,
           status,
           note: values.note,
-          price, // Ensure 'price' is included
+          price,
         };
 
         const newAppointment = await createAppointment(appointmentData);
@@ -112,18 +112,19 @@ export const AppointmentForm = ({
           );
         }
       } else if (appointment) {
-        const appointmentToUpdate = {
+        const const appointmentToUpdate = {
           userId,
           appointmentId: appointment.$id,
           appointment: {
-            stylist: values.stylist, // Updated to 'stylist'
+            primaryPhysician: values.primaryPhysician, // Still using 'primaryPhysician'
             schedule: new Date(values.schedule),
             status,
             cancellationReason: values.cancellationReason,
-            price, // Ensure 'price' is included
+            price,
           },
           type,
         };
+        
 
         const updatedAppointment = await updateAppointment(appointmentToUpdate);
 
@@ -169,7 +170,7 @@ export const AppointmentForm = ({
             <CustomFormField
               fieldType={FormFieldType.SELECT}
               control={form.control}
-              name="stylist" // Ensure this is 'stylist'
+              name="stylist" // Updated to 'stylist'
               label="Select a Stylist"
               placeholder="Select a stylist"
             >
@@ -188,7 +189,6 @@ export const AppointmentForm = ({
                 </SelectItem>
               ))}
             </CustomFormField>
-
             {/* Reason for Appointment */}
             <CustomFormField
               fieldType={FormFieldType.SKELETON}
